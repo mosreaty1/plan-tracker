@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../services/flight_service.dart';
 import '../models/flight.dart';
 import 'flight_detail_screen.dart';
@@ -17,7 +18,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _loading = false;
   String? _notFound;
 
-  static const _navyBlue = Color(0xFF1A2D6B);
+  static const _navy = Color(0xFF1A2D6B);
 
   Future<void> _search() async {
     final code = _searchCtrl.text.trim();
@@ -25,28 +26,33 @@ class _HomeScreenState extends State<HomeScreen> {
     FocusScope.of(context).unfocus();
     setState(() { _loading = true; _notFound = null; });
 
-    // Check if it's a ticket number first
     if (FlightService.isTicketNumber(code)) {
       if (!mounted) return;
       setState(() => _loading = false);
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const ItineraryScreen()),
-      );
+      Navigator.push(context, MaterialPageRoute(builder: (_) => const ItineraryScreen()));
       return;
     }
 
+    await Future.delayed(const Duration(milliseconds: 800));
     final flight = await FlightService.lookupFlight(code);
     if (!mounted) return;
     setState(() => _loading = false);
 
     if (flight == null) {
-      setState(() => _notFound = 'No flight found for "$code".\nPlease check the flight number and try again.');
+      setState(() => _notFound = 'No flight found for "$code".\nPlease check the number and try again.');
     } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => FlightDetailScreen(flight: flight)),
-      );
+      Navigator.push(context, MaterialPageRoute(builder: (_) => FlightDetailScreen(flight: flight)));
+    }
+  }
+
+  Future<void> _launch(String url) async {
+    final uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not open $url'), backgroundColor: _navy),
+        );
+      }
     }
   }
 
@@ -59,20 +65,20 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
+      backgroundColor: const Color(0xFFF2F4F8),
       appBar: AppBar(
-        backgroundColor: _navyBlue,
+        backgroundColor: _navy,
         elevation: 0,
         title: Image.asset(
-          'assets/egyptair_logo.png',
-          height: 34,
+          'assets/logo_white.png',
+          height: 36,
           errorBuilder: (_, __, ___) => Text(
-            'EGYPTAIR',
+            'EGYFLY',
             style: GoogleFonts.roboto(
               color: Colors.white,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 2,
-              fontSize: 18,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 2.5,
+              fontSize: 20,
             ),
           ),
         ),
@@ -88,9 +94,10 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top search card
+
+            // ── Search banner ──────────────────────────────
             Container(
-              color: _navyBlue,
+              color: _navy,
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,11 +112,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Enter your flight number to get live status',
-                    style: GoogleFonts.roboto(
-                      color: Colors.white60,
-                      fontSize: 13,
-                    ),
+                    'Enter a flight code or e-ticket number',
+                    style: GoogleFonts.roboto(color: Colors.white60, fontSize: 13),
                   ),
                   const SizedBox(height: 18),
                   Container(
@@ -127,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Row(
                       children: [
                         const SizedBox(width: 14),
-                        const Icon(Icons.flight_takeoff, color: Color(0xFF1A2D6B), size: 22),
+                        const Icon(Icons.flight_takeoff, color: _navy, size: 22),
                         const SizedBox(width: 10),
                         Expanded(
                           child: TextField(
@@ -136,13 +140,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: GoogleFonts.roboto(
                               fontSize: 15,
                               fontWeight: FontWeight.w500,
-                              color: const Color(0xFF1A2D6B),
+                              color: _navy,
                             ),
                             decoration: InputDecoration(
                               hintText: 'e.g. MS001 or EF 381-7612834521',
                               hintStyle: GoogleFonts.roboto(
                                 color: Colors.grey.shade400,
-                                fontSize: 14,
+                                fontSize: 13,
                               ),
                               border: InputBorder.none,
                               contentPadding: const EdgeInsets.symmetric(vertical: 16),
@@ -155,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: ElevatedButton(
                             onPressed: _loading ? null : _search,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: _navyBlue,
+                              backgroundColor: _navy,
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
@@ -206,31 +210,117 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // Quick-access flights
             const SizedBox(height: 24),
+
+            // ── EgyFly logo + branding card ────────────────
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Text(
-                "Today's Flights",
-                style: GoogleFonts.roboto(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xFF1A2D6B),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Image.asset(
+                      'assets/logo_blue.png',
+                      height: 60,
+                      errorBuilder: (_, __, ___) => Text(
+                        'EGYFLY',
+                        style: GoogleFonts.roboto(
+                          color: _navy,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 3,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Your Egyptian Low-Cost Carrier',
+                      style: GoogleFonts.roboto(
+                        color: Colors.grey.shade500,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-            const SizedBox(height: 14),
-            ..._quickFlights.map((item) => _QuickFlightTile(
-              flightCode: item['code']!,
-              route: item['route']!,
-              time: item['time']!,
-              status: item['status']!,
-              onTap: () {
-                _searchCtrl.text = item['code']!;
-                _search();
-              },
-            )),
-            const SizedBox(height: 30),
+
+            const SizedBox(height: 20),
+
+            // ── Official Websites ──────────────────────────
+            _SectionHeader(title: 'Official Websites'),
+            _LinkTile(
+              icon: Icons.language_outlined,
+              label: 'Main Site',
+              subtitle: 'www.flyegypt.com',
+              onTap: () => _launch('https://www.flyegypt.com'),
+            ),
+            _LinkTile(
+              icon: Icons.airplane_ticket_outlined,
+              label: 'Book a Flight',
+              subtitle: 'www.flyegypt.com/book',
+              onTap: () => _launch('https://www.flyegypt.com/book'),
+            ),
+            _LinkTile(
+              icon: Icons.edit_calendar_outlined,
+              label: 'Manage Booking',
+              subtitle: 'www.flyegypt.com/manage',
+              onTap: () => _launch('https://www.flyegypt.com/manage'),
+            ),
+            _LinkTile(
+              icon: Icons.link,
+              label: 'Short URL',
+              subtitle: 'www.fly.eg',
+              onTap: () => _launch('https://www.fly.eg'),
+              isLast: true,
+            ),
+
+            const SizedBox(height: 20),
+
+            // ── Social Media ───────────────────────────────
+            _SectionHeader(title: 'Social Media'),
+            _LinkTile(
+              icon: Icons.facebook_outlined,
+              iconColor: const Color(0xFF1877F2),
+              label: 'Facebook',
+              subtitle: 'flyegyptairlines',
+              onTap: () => _launch('https://www.facebook.com/flyegyptairlines'),
+            ),
+            _LinkTile(
+              icon: Icons.work_outline,
+              iconColor: const Color(0xFF0A66C2),
+              label: 'LinkedIn',
+              subtitle: 'company/flyegypt',
+              onTap: () => _launch('https://www.linkedin.com/company/flyegypt'),
+              isLast: true,
+            ),
+
+            const SizedBox(height: 20),
+
+            // ── Contact ────────────────────────────────────
+            _SectionHeader(title: 'Contact'),
+            _LinkTile(
+              icon: Icons.phone_outlined,
+              iconColor: const Color(0xFF2E7D32),
+              label: 'Customer Service',
+              subtitle: '15290',
+              onTap: () => _launch('tel:15290'),
+              isLast: true,
+            ),
+
+            const SizedBox(height: 32),
           ],
         ),
       ),
@@ -238,118 +328,107 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-const _quickFlights = [
-  {'code': 'MS001', 'route': 'Cairo → London', 'time': '08:30', 'status': 'On Time'},
-  {'code': 'MS700', 'route': 'Cairo → Dubai', 'time': '16:45', 'status': 'Boarding'},
-  {'code': 'MS100', 'route': 'Cairo → New York', 'time': '02:15', 'status': 'Delayed'},
-  {'code': 'MS600', 'route': 'Cairo → Riyadh', 'time': '09:30', 'status': 'On Time'},
-  {'code': 'MS300', 'route': 'Cairo → Frankfurt', 'time': '07:00', 'status': 'Cancelled'},
-];
+// ── Reusable widgets ───────────────────────────────────────────────────────────
 
-class _QuickFlightTile extends StatelessWidget {
-  final String flightCode;
-  final String route;
-  final String time;
-  final String status;
-  final VoidCallback onTap;
-
-  const _QuickFlightTile({
-    required this.flightCode,
-    required this.route,
-    required this.time,
-    required this.status,
-    required this.onTap,
-  });
-
-  Color get _statusColor {
-    switch (status) {
-      case 'Delayed': return const Color(0xFFE65100);
-      case 'Cancelled': return const Color(0xFFE53935);
-      case 'Boarding': return const Color(0xFF1565C0);
-      default: return const Color(0xFF2E7D32);
-    }
-  }
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  const _SectionHeader({required this.title});
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(20, 0, 20, 10),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 10),
+      child: Text(
+        title,
+        style: GoogleFonts.roboto(
+          fontSize: 13,
+          fontWeight: FontWeight.w700,
+          color: const Color(0xFF1A2D6B),
+          letterSpacing: 0.3,
         ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: const Color(0xFF1A2D6B).withOpacity(0.08),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: const Icon(Icons.flight_takeoff, color: Color(0xFF1A2D6B), size: 20),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
+      ),
+    );
+  }
+}
+
+class _LinkTile extends StatelessWidget {
+  final IconData icon;
+  final Color? iconColor;
+  final String label;
+  final String subtitle;
+  final VoidCallback onTap;
+  final bool isLast;
+
+  const _LinkTile({
+    required this.icon,
+    this.iconColor,
+    required this.label,
+    required this.subtitle,
+    required this.onTap,
+    this.isLast = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    const navy = Color(0xFF1A2D6B);
+    final effectiveIconColor = iconColor ?? navy;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16, 0, 16, isLast ? 0 : 1),
+      child: Material(
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: const Radius.circular(0),
+          topRight: const Radius.circular(0),
+          bottomLeft: isLast ? const Radius.circular(12) : Radius.zero,
+          bottomRight: isLast ? const Radius.circular(12) : Radius.zero,
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.only(
+            bottomLeft: isLast ? const Radius.circular(12) : Radius.zero,
+            bottomRight: isLast ? const Radius.circular(12) : Radius.zero,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: effectiveIconColor.withOpacity(0.09),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(icon, color: effectiveIconColor, size: 18),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        flightCode,
+                        label,
                         style: GoogleFonts.roboto(
-                          fontWeight: FontWeight.w700,
                           fontSize: 14,
-                          color: const Color(0xFF1A2D6B),
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF1F2937),
                         ),
                       ),
-                      const SizedBox(width: 10),
                       Text(
-                        route,
+                        subtitle,
                         style: GoogleFonts.roboto(
-                          fontSize: 13,
-                          color: Colors.grey.shade600,
+                          fontSize: 12,
+                          color: Colors.grey.shade500,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Departs $time',
-                    style: GoogleFonts.roboto(fontSize: 12, color: Colors.grey.shade400),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: _statusColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                status,
-                style: GoogleFonts.roboto(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
-                  color: _statusColor,
                 ),
-              ),
+                Icon(Icons.open_in_new, size: 16, color: Colors.grey.shade400),
+              ],
             ),
-            const SizedBox(width: 6),
-            Icon(Icons.chevron_right, color: Colors.grey.shade400, size: 18),
-          ],
+          ),
         ),
       ),
     );

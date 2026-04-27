@@ -62,17 +62,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   children: [
                     Image.asset(
-                      'assets/egyptair_logo.png',
-                      height: 90,
+                      'assets/logo_white.png',
+                      height: 80,
                       errorBuilder: (_, __, ___) => _FallbackLogo(),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                     Text(
-                      'Flight Tracker',
+                      'FLIGHT TRACKER',
                       style: GoogleFonts.roboto(
-                        color: Colors.white70,
-                        fontSize: 14,
-                        letterSpacing: 2.5,
+                        color: Colors.white54,
+                        fontSize: 11,
+                        letterSpacing: 3,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
