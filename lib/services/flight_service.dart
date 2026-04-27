@@ -133,6 +133,12 @@ class FlightService {
     ),
   };
 
+  static bool isTicketNumber(String input) {
+    // Matches "EF 381-7612834521" or "EF381-7612834521" (case-insensitive)
+    final cleaned = input.replaceAll(' ', '').toUpperCase();
+    return cleaned == 'EF381-7612834521';
+  }
+
   static Future<Flight?> lookupFlight(String code) async {
     await Future.delayed(const Duration(milliseconds: 800));
     final key = code.toUpperCase().trim();

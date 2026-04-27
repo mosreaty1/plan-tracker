@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../services/flight_service.dart';
 import '../models/flight.dart';
 import 'flight_detail_screen.dart';
+import 'itinerary_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -23,6 +24,17 @@ class _HomeScreenState extends State<HomeScreen> {
     if (code.isEmpty) return;
     FocusScope.of(context).unfocus();
     setState(() { _loading = true; _notFound = null; });
+
+    // Check if it's a ticket number first
+    if (FlightService.isTicketNumber(code)) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const ItineraryScreen()),
+      );
+      return;
+    }
 
     final flight = await FlightService.lookupFlight(code);
     if (!mounted) return;
@@ -127,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               color: const Color(0xFF1A2D6B),
                             ),
                             decoration: InputDecoration(
-                              hintText: 'e.g. MS001, MS700',
+                              hintText: 'e.g. MS001 or EF 381-7612834521',
                               hintStyle: GoogleFonts.roboto(
                                 color: Colors.grey.shade400,
                                 fontSize: 14,
