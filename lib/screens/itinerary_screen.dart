@@ -36,10 +36,17 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF2F4F8),
-      appBar: AppBar(
-        backgroundColor: _navy,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        systemNavigationBarColor: Color(0xFFF2F4F8),
+        systemNavigationBarIconBrightness: Brightness.dark,
+        statusBarColor: Color(0xFF1A2D6B),
+        statusBarIconBrightness: Brightness.light,
+      ),
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF2F4F8),
+        appBar: AppBar(
+          backgroundColor: _navy,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 18),
@@ -350,6 +357,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
               ),
             ),
           ],
+        ),
         ),
       ),
     );

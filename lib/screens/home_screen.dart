@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../services/flight_service.dart';
@@ -64,10 +65,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF2F4F8),
-      appBar: AppBar(
-        backgroundColor: _navy,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: const SystemUiOverlayStyle(
+        systemNavigationBarColor: Color(0xFFF2F4F8),
+        systemNavigationBarIconBrightness: Brightness.dark,
+        statusBarColor: Color(0xFF1A2D6B),
+        statusBarIconBrightness: Brightness.light,
+      ),
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF2F4F8),
+        appBar: AppBar(
+          backgroundColor: _navy,
         elevation: 0,
         title: Image.asset(
           'assets/logo_white.png',
@@ -322,6 +330,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 32),
           ],
+        ),
         ),
       ),
     );
