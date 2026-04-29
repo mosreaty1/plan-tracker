@@ -169,7 +169,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
             const SizedBox(height: 14),
 
             // ── Section label ─────────────────────────────
-            _sectionLabel('Sunday, 13 April 2026'),
+            _sectionLabel('Sunday, 3 May 2026'),
 
             // ── Outbound flight card ──────────────────────
             _FlightCard(
@@ -180,14 +180,14 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
               fromCity: 'Cairo',
               fromAirport: 'Cairo International Airport',
               fromTerminal: 'Terminal 1',
-              fromTime: '11:00',
-              fromDate: '13 Apr 2026',
+              fromTime: '04:30',
+              fromDate: '3 May 2026',
               toCode: 'DXB',
               toCity: 'Dubai',
               toAirport: 'Dubai International Airport',
               toTerminal: 'Terminal 3',
-              toTime: '14:30',
-              toDate: '13 Apr 2026',
+              toTime: '08:00',
+              toDate: '3 May 2026',
               duration: '3h 30m',
               details: const [
                 _Detail('Booking Status', 'Confirmed', Icons.check_circle_outline, Color(0xFF2E7D32)),
