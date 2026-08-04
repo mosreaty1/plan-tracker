@@ -229,6 +229,36 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
             ),
 
             const SizedBox(height: 14),
+            _sectionLabel('Thursday, 6 Aug 2026'),
+
+            // ── Cairo → Jeddah flight card ────────────────
+            _FlightCard(
+              flightLabel: 'EgyFly  EF 012',
+              tag: 'Outbound',
+              tagColor: const Color(0xFF1565C0),
+              fromCode: 'CAI',
+              fromCity: 'Cairo',
+              fromAirport: 'Cairo International Airport',
+              fromTerminal: 'Terminal 1',
+              fromTime: '06:00',
+              fromDate: '6 Aug 2026',
+              toCode: 'JED',
+              toCity: 'Jeddah',
+              toAirport: 'King Abdulaziz International Airport',
+              toTerminal: 'Terminal 1',
+              toTime: '08:30',
+              toDate: '6 Aug 2026',
+              duration: '2h 30m',
+              details: const [
+                _Detail('Booking Status', 'Confirmed', Icons.check_circle_outline, Color(0xFF2E7D32)),
+                _Detail('Class', 'Economy (Y)', Icons.airline_seat_recline_normal_outlined, null),
+                _Detail('Baggage', '1 Piece(s)', Icons.luggage_outlined, null),
+                _Detail('Aircraft', 'Boeing 737-800', Icons.airplanemode_active, null),
+                _Detail('Flight Meal', 'Full Meal', Icons.restaurant_outlined, null),
+              ],
+            ),
+
+            const SizedBox(height: 14),
 
             // ── Ticket details ────────────────────────────
             _buildCard(
