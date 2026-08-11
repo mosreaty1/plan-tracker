@@ -289,6 +289,36 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
             ),
 
             const SizedBox(height: 14),
+            _sectionLabel('Wednesday, 12 Aug 2026'),
+
+            // ── Riyadh → Alamein flight card ──────────────
+            _FlightCard(
+              flightLabel: 'EgyFly  EF 022',
+              tag: 'Inbound',
+              tagColor: const Color(0xFF2E7D32),
+              fromCode: 'RUH',
+              fromCity: 'Riyadh',
+              fromAirport: 'King Khalid International Airport',
+              fromTerminal: 'Terminal 5',
+              fromTime: '02:00',
+              fromDate: '12 Aug 2026',
+              toCode: 'AAC',
+              toCity: 'Alamein',
+              toAirport: 'Alamein International Airport',
+              toTerminal: 'Terminal 1',
+              toTime: '04:30',
+              toDate: '12 Aug 2026',
+              duration: '2h 30m',
+              details: const [
+                _Detail('Booking Status', 'Confirmed', Icons.check_circle_outline, Color(0xFF2E7D32)),
+                _Detail('Class', 'Economy (Y)', Icons.airline_seat_recline_normal_outlined, null),
+                _Detail('Baggage', '1 Piece(s)', Icons.luggage_outlined, null),
+                _Detail('Aircraft', 'Airbus A320', Icons.airplanemode_active, null),
+                _Detail('Flight Meal', 'Full Meal', Icons.restaurant_outlined, null),
+              ],
+            ),
+
+            const SizedBox(height: 14),
 
             // ── Ticket details ────────────────────────────
             _buildCard(
